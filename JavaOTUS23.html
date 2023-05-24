@@ -1,0 +1,161 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Форма и таблица</title>
+    <style>
+      * {
+        margin-left: auto;
+        margin-right: auto;
+        box-sizing: border-box;
+      }
+      h2 {
+        text-align: center;
+      }
+
+      form {
+        text-align: left;
+        border: 1px solid black;
+        width: 300px;
+        padding: 10px;
+      }
+
+      table {
+        border-collapse: collapse;
+        width: 500px;
+      }
+
+      th,
+      td {
+        text-align: left;
+        border: 1px solid black;
+        padding: 8px;
+      }
+    </style>
+  </head>
+
+  <body>
+    <h2>Форма добавления информации о студенте</h2>
+    <form id="myForm">
+      <label for="name">Имя:</label>
+      <input type="text" id="name" required /><br /><br />
+      <label for="birthdate">Дата рождения:</label>
+      <input type="date" id="birthdate" required /><br /><br />
+      <label for="gender">Пол:</label>
+      <select id="gender" required>
+        <option value="мужской">мужской</option>
+        <option value="женский">женский</option></select
+      ><br /><br />
+      <input type="button" value="Добавить" onclick="addItem()" />
+    </form>
+
+    <h2>Таблица студентов</h2>
+    <table id="myTable">
+      <thead>
+        <tr>
+          <th>Имя</th>
+          <th>Дата рождения</th>
+          <th>Пол</th>
+          <th>Возраст</th>
+        </tr>
+      </thead>
+      <tbody id="tableBody">
+        <tr>
+          <td>Иван Ограномович Штейн</td>
+          <td>1969-05-09</td>
+          <td>мужской</td>
+          <td>26</td>
+        </tr>
+        <tr>
+          <td>Авраам Генадьевич Линкольн</td>
+          <td>1997-05-09</td>
+          <td>мужской</td>
+          <td>54</td>
+        </tr>
+        <tr id="target">
+          <td colspan="4"></td>
+        </tr>
+        <tr>
+          <td colspan="3">Средний возраст студентов</td>
+          <td id="middleAge"></td>
+        </tr>
+      </tbody>
+    </table>
+
+    <script>
+      var items = [];
+
+      function addItem() {
+        var nameInput = document.getElementById("name");
+        var birthdateInput = document.getElementById("birthdate");
+        var genderInput = document.getElementById("gender");
+        var getAge = 0;
+        if (!isNaN(Date.parse(birthdateInput.value))) {
+          getAge = Math.floor(
+            (new Date().getTime() - new Date(birthdateInput.value)) /
+              (24 * 3600 * 365.25 * 1000)
+          );
+        }
+
+        var newItem = {
+          name: nameInput.value,
+          birthdate: birthdateInput.value,
+          gender: genderInput.value,
+          age: getAge,
+        };
+
+        items.push(newItem);
+
+        nameInput.value = "";
+        birthdateInput.value = "";
+        genderInput.value = "male";
+
+        updateTable(newItem);
+        updateAverageAge();
+      }
+
+      function updateTable(item) {
+        var tableBody = document.getElementById("tableBody");
+        var target = document.getElementById("target");
+        var row = document.createElement("tr");
+        var nameCell = document.createElement("td");
+        var birthdateCell = document.createElement("td");
+        var genderCell = document.createElement("td");
+        var ageCell = document.createElement("td");
+
+        nameCell.textContent = item.name;
+        birthdateCell.textContent = item.birthdate;
+        genderCell.textContent = item.gender;
+        ageCell.textContent = item.age;
+
+        row.appendChild(nameCell);
+        row.appendChild(birthdateCell);
+        row.appendChild(genderCell);
+        row.appendChild(ageCell);
+
+        tableBody.insertBefore(row, target);
+      }
+
+      function updateAverageAge() {
+        var tableBody = document.getElementById("tableBody");
+        var rows = tableBody.getElementsByTagName("tr");
+        var sumAge = 0;
+        var count = 0;
+
+        for (var i = 0; i < rows.length; i++) {
+          var ageCell = rows[i].getElementsByTagName("td")[3];
+          if (ageCell) {
+            var age = parseInt(ageCell.textContent);
+            if (!isNaN(age)) {
+              sumAge += age;
+              count++;
+            }
+          }
+        }
+
+        var averageAge = count > 0 ? sumAge / count : 0;
+        var middleAgeCell = document.getElementById("middleAge");
+        middleAgeCell.textContent = averageAge.toFixed(2);
+      }
+    </script>
+  </body>
+</html>
